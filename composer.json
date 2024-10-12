@@ -1,8 +1,8 @@
 {
-    "name": "vendic/telemetry-service",
+    "name": "webgrip/telemetry-service",
     "type": "library",
     "license": "MIT",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "A simple telemetry service for PHP applications",
     "keywords": [
         "telemetry",
