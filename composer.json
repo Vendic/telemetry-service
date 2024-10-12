@@ -1,5 +1,5 @@
 {
-    "name": "webgrip/telemetry-service",
+    "name": "vendic/telemetry-service",
     "type": "library",
     "license": "MIT",
     "version": "0.2.0",
