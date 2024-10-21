@@ -17,34 +17,33 @@ use Webgrip\TelemetryService\Core\Domain\Services\TelemetryServiceInterface;
 final readonly class TelemetryService implements TelemetryServiceInterface
 {
     /**
-     * @param LoggerProviderInterface $loggerProvider
-     * @param TracerProviderInterface $tracerProvider
      * @param Logger $logger
      */
     public function __construct(
         private LoggerProviderInterface $loggerProvider,
         private TracerProviderInterface $tracerProvider,
-        private Logger $logger,
+        private LoggerInterface $logger,
     ) {
-        $this->logger->pushHandler(
-            new Handler(
-                $this->loggerProvider,
-                Level::Debug
-            )
-        );
+        $this->hookLoggerIntoMonolog();
     }
 
-    /**
-     * @return LoggerInterface
-     */
+    public function hookLoggerIntoMonolog(): void
+    {
+        if ($this->loggerProvider instanceof Logger) {
+            $this->$this->logger->pushHandler(
+                new Handler(
+                    $this->loggerProvider,
+                    Level::Debug
+                )
+            );
+        }
+    }
+
     public function logger(): LoggerInterface
     {
         return $this->logger;
     }
 
-    /**
-     * @return TracerInterface
-     */
     public function tracer(): TracerInterface
     {
         return $this->tracerProvider->getTracer('io.opentelemetry.contrib.php');
@@ -52,14 +51,11 @@ final readonly class TelemetryService implements TelemetryServiceInterface
 
     public function registerException(\Throwable $exception, SpanInterface $span): void
     {
-        $this->logger()->error($exception->getMessage(), ['exception' => $exception]);
+        $this->logger->error($exception->getMessage(), ['exception' => $exception]);
         $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
         $span->recordException($exception);
     }
 
-    /**
-     * @return SpanInterface
-     */
     public function getCurrentSpan(): SpanInterface
     {
         return Span::getCurrent();
